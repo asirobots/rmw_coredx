@@ -63,10 +63,10 @@ rmw_get_service_names_and_types(
     RMW_SET_ERROR_MSG("node info handle is null");
     return RMW_RET_ERROR;
   }
-	
-  RMW_SET_ERROR_MSG("get service names and types is not implemented!");
+  
+  // RMW_SET_ERROR_MSG("get service names and types is not implemented!");
 
-  return RMW_RET_ERROR;
+  return RMW_RET_OK;
 }
 
 
