@@ -29,7 +29,6 @@
 #include "rmw_coredx_cpp/identifier.hpp"
 #include "rmw_coredx_types.hpp"
 #include "util.hpp"
-#include "names.hpp"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -69,12 +68,8 @@ rmw_count_publishers( const rmw_node_t * node,
     return RMW_RET_ERROR;
   }
 
-  char * topic_str     = nullptr;
-  char * partition_str = nullptr;
-  rmw_coredx_process_topic_name(topic_name, false, &topic_str, &partition_str);
-
   const auto & topic_names_and_types = node_info->publisher_listener->topic_names_and_types;
-  auto it = topic_names_and_types.find(topic_str);
+  auto it = topic_names_and_types.find(topic_name);
   if (it == topic_names_and_types.end()) {
     *count = 0;
   } else {

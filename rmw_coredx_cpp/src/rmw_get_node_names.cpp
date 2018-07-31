@@ -24,7 +24,6 @@
 #include <rmw/impl/cpp/macros.hpp>
 #include <rmw/sanity_checks.h>
 #include <rmw/convert_rcutils_ret_to_rmw_ret.h>
-
 #include <rcutils/logging_macros.h>
 #include <rcutils/allocator.h>
 #include <rcutils/strdup.h>

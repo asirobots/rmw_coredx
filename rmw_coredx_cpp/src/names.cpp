@@ -93,9 +93,12 @@ rmw_coredx_process_topic_name(
     {
       if ( !avoid_ros_namespace_conventions )
         {
-          *partition_str = do_strdup( ros_topic_prefix );
+          *topic_str = rcutils_format_string(allocator, "%s/%s", ros_topic_prefix, name_tokens.data[0]);
         }
-      *topic_str = do_strdup( name_tokens.data[0] );
+      else
+        {
+          *topic_str = do_strdup( name_tokens.data[0] );
+        }
     }
   else if ( name_tokens.size == 2 )
     {

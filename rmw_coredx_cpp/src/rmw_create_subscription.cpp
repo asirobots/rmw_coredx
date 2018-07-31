@@ -144,10 +144,10 @@ rmw_create_subscription( const rmw_node_t        * node,
   }
   
   dds_subscriber = participant->create_subscriber(subscriber_qos, NULL, 0);
-  if ( partition_str && 
-       ( strlen(partition_str) != 0) ) {  // only set if not empty
-    subscriber_qos.partition.name[0] = nullptr;
-  }
+  // if ( partition_str && 
+  //      ( strlen(partition_str) != 0) ) {  // only set if not empty
+  //   subscriber_qos.partition.name[0] = nullptr;
+  // }
   if (!dds_subscriber) {
     RMW_SET_ERROR_MSG("failed to create subscriber");
     goto fail;

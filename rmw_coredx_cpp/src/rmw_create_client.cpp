@@ -142,7 +142,7 @@ rmw_create_client( const rmw_node_t                   * node,
   rmw_free(service_str);
   service_str = nullptr;
 
-  // update partition in the client subscriber 
+  // update partition in the service subscriber 
   if ( response_partition_str &&
        (strlen(response_partition_str) != 0) ) {
     DDS::Subscriber * dds_subscriber = nullptr;
@@ -161,7 +161,7 @@ rmw_create_client( const rmw_node_t                   * node,
   rmw_free( response_partition_str );
   response_partition_str = nullptr;
 
-  // update partition in the client publisher 
+  // update partition in the service publisher 
   if ( request_partition_str &&
        (strlen(request_partition_str) != 0) ) {
     DDS::Publisher * dds_publisher = nullptr;

@@ -8,7 +8,9 @@
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>coredx_binary</build_depend>
   
+  <build_export_depend>coredx_binary</build_export_depend>
   <buildtool_export_depend>ament_cmake</buildtool_export_depend>
 
   <test_depend>ament_lint_auto</test_depend>

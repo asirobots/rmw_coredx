@@ -120,6 +120,8 @@ int64_t send_request__@(spec.srv_name)(
 void * create_replier__@(spec.srv_name)(
   void * untyped_participant,
   const char * service_name,
+  const char * request_topic_name,
+  const char * reply_topic_name,
   const void * untyped_datareader_qos,
   const void * untyped_datawriter_qos,
   void ** untyped_reader,
@@ -141,6 +143,8 @@ void * create_replier__@(spec.srv_name)(
   replier_params
     .domain_participant(participant)
     .service_name(service_name)
+    .request_topic_name(request_topic_name)
+    .reply_topic_name(reply_topic_name)
     .datareader_qos(*datareader_qos)
     .datawriter_qos(*datawriter_qos);
 

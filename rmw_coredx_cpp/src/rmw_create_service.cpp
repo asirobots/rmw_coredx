@@ -85,10 +85,13 @@ rmw_create_service( const rmw_node_t                    * node,
     RMW_SET_ERROR_MSG("callbacks handle is null");
     return NULL;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
 
   char * request_partition_str = nullptr;
   char * response_partition_str = nullptr;
   char * service_str = nullptr;
+  char * request_topic_name = nullptr;
+  char * reply_topic_name = nullptr;
   if (!rmw_coredx_process_service_name(
       service_name,
       qos_profile->avoid_ros_namespace_conventions,
@@ -128,8 +131,14 @@ rmw_create_service( const rmw_node_t                    * node,
     goto fail;
   }
 
+  request_topic_name = rcutils_format_string(allocator, "%s%sRequest", ros_service_requester_prefix, service_name);
+  reply_topic_name = rcutils_format_string(allocator, "%s%sReply", ros_service_response_prefix, service_name);
+
   replier = callbacks->create_replier(
-    participant, service_str, &datareader_qos, &datawriter_qos,
+    participant, service_str,
+    request_topic_name,
+    reply_topic_name,
+    &datareader_qos, &datawriter_qos,
     reinterpret_cast<void **>(&request_datareader),
     reinterpret_cast<void **>(&reply_datawriter),
     &rmw_allocate);
@@ -144,44 +153,59 @@ rmw_create_service( const rmw_node_t                    * node,
   rmw_free( service_str );
   service_str = nullptr;
 
+  std::cout << "coredx request_topic_name: " << request_datareader->get_topicdescription()->get_name() << std::endl;
+  std::cout << "coredx reply_topic_name: " << reply_datawriter->get_topic()->get_name() << std::endl;
+
+  rmw_free( request_topic_name );
+  request_topic_name = nullptr;
+
+  rmw_free( reply_topic_name );
+  reply_topic_name = nullptr;
+
   // update partition in the service subscriber 
-  if ( request_partition_str &&
-       (strlen(request_partition_str) != 0) ) {
-    DDS::Subscriber * dds_subscriber = nullptr;
-    DDS::SubscriberQos subscriber_qos;
-    dds_subscriber = request_datareader->get_subscriber();
-    DDS::ReturnCode_t status = dds_subscriber->get_qos( subscriber_qos );
-    if (status != DDS::RETCODE_OK) {
-      RMW_SET_ERROR_MSG("failed to get default subscriber qos");
-      goto fail;
-    }
-    subscriber_qos.partition.name.resize( 1 );
-    subscriber_qos.partition.name[0] = request_partition_str;
-    dds_subscriber->set_qos(subscriber_qos);
-    subscriber_qos.partition.name[0] = nullptr;
-  }
-  rmw_free( request_partition_str );
-  request_partition_str = nullptr;
+  // if ( response_partition_str &&
+  //      (strlen(response_partition_str) != 0) ) {
+  //   DDS::Subscriber * dds_subscriber = nullptr;
+  //   DDS::SubscriberQos subscriber_qos;
+  //   dds_subscriber = request_datareader->get_subscriber();
+  //   DDS::ReturnCode_t status = dds_subscriber->get_qos( subscriber_qos );
+  //   if (status != DDS::RETCODE_OK) {
+  //     RMW_SET_ERROR_MSG("failed to get default subscriber qos");
+  //     goto fail;
+  //   }
+  //   subscriber_qos.partition.name.resize( 1 );
+  //   subscriber_qos.partition.name[0] = response_partition_str;
+  //   dds_subscriber->set_qos(subscriber_qos);
+  //   subscriber_qos.partition.name[0] = nullptr;
+  // }
+  // rmw_free( response_partition_str );
+  // response_partition_str = nullptr;
   
   // update partition in the service publisher 
-  if ( (response_partition_str) &&
-       (strlen(response_partition_str) != 0) ) {
-    DDS::Publisher * dds_publisher = nullptr;
-    DDS::PublisherQos publisher_qos;
-    dds_publisher = reply_datawriter->get_publisher();
-    DDS::ReturnCode_t status = dds_publisher->get_qos( publisher_qos );
-    if (status != DDS_RETCODE_OK) {
-      RMW_SET_ERROR_MSG("failed to get default subscriber qos");
-      goto fail;
-    }
-    publisher_qos.partition.name.resize( 1 );
-    publisher_qos.partition.name[0] = response_partition_str;
-    dds_publisher->set_qos(publisher_qos);
-    publisher_qos.partition.name[0] = nullptr;
-  }
-  rmw_free( response_partition_str );
-  response_partition_str = nullptr;
-    
+  // if ( (request_partition_str) &&
+  //      (strlen(request_partition_str) != 0) ) {
+  //   DDS::Publisher * dds_publisher = nullptr;
+  //   DDS::PublisherQos publisher_qos;
+  //   dds_publisher = reply_datawriter->get_publisher();
+  //   DDS::ReturnCode_t status = dds_publisher->get_qos( publisher_qos );
+  //   if (status != DDS_RETCODE_OK) {
+  //     RMW_SET_ERROR_MSG("failed to get default subscriber qos");
+  //     goto fail;
+  //   }
+  //   publisher_qos.partition.name.resize( 1 );
+  //   publisher_qos.partition.name[0] = request_partition_str;
+  //   dds_publisher->set_qos(publisher_qos);
+  //   publisher_qos.partition.name[0] = nullptr;
+  // }
+  // rmw_free( request_partition_str );
+  // request_partition_str = nullptr;
+  // DDS::Topic * dds_request_topic = reply_datawriter->get_topic();
+  // rcutils_allocator_t    allocator   = rcutils_get_default_allocator();
+  // char* request_topic_name = rcutils_format_string(allocator, "%s/%s", ros_topic_prefix, dds_request_topic->get_name());
+  // dds_request_topic->set_name(request_topic_name);
+  // rmw_free( request_topic_name );
+  // request_topic_name = nullptr;
+
   read_condition = request_datareader->create_readcondition(
      DDS::ANY_SAMPLE_STATE, DDS::ANY_VIEW_STATE, DDS::ANY_INSTANCE_STATE);
   if (!read_condition) {
@@ -220,6 +244,8 @@ fail:
   rmw_free( request_partition_str ); 
   rmw_free( response_partition_str );
   rmw_free( service_str );
+  rmw_free( request_topic_name );
+  rmw_free( reply_topic_name );
   
   if (service) {
     rmw_service_free(service);

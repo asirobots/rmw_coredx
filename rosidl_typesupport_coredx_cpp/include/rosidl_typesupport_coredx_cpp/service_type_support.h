@@ -36,6 +36,8 @@ typedef struct service_type_support_callbacks_t
   // Function to create a replier
   void * (*create_replier)(
     void * participant, const char * service_name,
+    const char * request_topic_name,
+    const char * reply_topic_name,
     const void * datareader_qos, const void * datawriter_qos,
     void ** reader, void ** writer,
     void * (*allocator)(size_t));
