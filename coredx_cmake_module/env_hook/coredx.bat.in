@@ -5,7 +5,7 @@ set "CoreDX_HOME=@CoreDX_HOME@"
 :: will request user input to select the host or platform or both.
 :: call "%CoreDX_HOME:/=\%\scripts\cdxenv.bat" 1> nul
 :: Add the CoreDX_LIBRARY_DIR to the Path so .dll's can be found at runtime.
-set "CoreDX_LIBRARY_DIR=@CoreDX_LIBRARY_DIR@"
+set "CoreDX_LIBRARY_DIR=%COREDX_TOP%\@CoreDX_LIBRARY_RELATIVE_DIR@"
 call:ament_prepend_unique_value PATH "%CoreDX_LIBRARY_DIR:/=\%"
 call:ament_prepend_unique_value PATH "%COREDX_TOP:/=\%\host\%COREDX_HOST%\bin"
 set "CoreDX_LIBRARY_DIR="

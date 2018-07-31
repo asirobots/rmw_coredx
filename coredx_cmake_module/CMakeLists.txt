@@ -25,6 +25,8 @@ find_package(CoreDX MODULE)
 if(CoreDX_HOME)
   normalize_path(CoreDX_HOME "${CoreDX_HOME}")
   normalize_path(CoreDX_LIBRARY_DIR "${CoreDX_LIBRARY_DIR}")
+  string(REPLACE "${CoreDX_HOME}/" "" CoreDX_LIBRARY_RELATIVE_DIR "${CoreDX_LIBRARY_DIR}")
+  
   if(WIN32)
     ament_environment_hooks(env_hook/coredx.bat.in)
   else()
