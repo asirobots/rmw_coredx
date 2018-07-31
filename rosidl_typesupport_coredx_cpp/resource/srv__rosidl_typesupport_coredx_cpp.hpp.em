@@ -41,6 +41,8 @@ void *
 create_requester__@(spec.srv_name)(
   void * untyped_participant,
   const char * service_name,
+  const char * request_topic_name,
+  const char * reply_topic_name,
   const void * untyped_datareader_qos,
   const void * untyped_datawriter_qos,
   void ** untyped_reader,

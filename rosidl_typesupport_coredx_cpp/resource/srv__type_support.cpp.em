@@ -42,6 +42,8 @@ namespace typesupport_coredx_cpp
 void * create_requester__@(spec.srv_name)(
   void * untyped_participant,
   const char * service_name,
+  const char * request_topic_name,
+  const char * reply_topic_name,
   const void * untyped_datareader_qos,
   const void * untyped_datawriter_qos,
   void ** untyped_reader,
@@ -60,11 +62,13 @@ void * create_requester__@(spec.srv_name)(
   const DDS::DataReaderQos * datareader_qos = static_cast<const DDS::DataReaderQos *>(untyped_datareader_qos);
   const DDS::DataWriterQos * datawriter_qos = static_cast<const DDS::DataWriterQos *>(untyped_datawriter_qos);
   DDS::rpc::RequesterParams requester_params;
-  requester_params.
-    domain_participant(participant).
-    service_name(service_name).
-    datareader_qos(*datareader_qos).
-    datawriter_qos(*datawriter_qos);
+  requester_params
+    .domain_participant(participant)
+    .service_name(service_name)
+    .request_topic_name(request_topic_name)
+    .reply_topic_name(reply_topic_name)
+    .datareader_qos(*datareader_qos)
+    .datawriter_qos(*datawriter_qos);
 
   RequesterType * requester = static_cast<RequesterType *>(_allocator(sizeof(RequesterType)));
   try {

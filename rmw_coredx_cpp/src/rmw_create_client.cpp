@@ -84,9 +84,13 @@ rmw_create_client( const rmw_node_t                   * node,
     RMW_SET_ERROR_MSG("callbacks handle is null");
     return NULL;
   }
+
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   char * request_partition_str = nullptr;
   char * response_partition_str = nullptr;
   char * service_str = nullptr;
+  char * request_topic_name = nullptr;
+  char * reply_topic_name = nullptr;
   if ( !rmw_coredx_process_service_name(
                                         service_name,
                                         qos_profile->avoid_ros_namespace_conventions,
@@ -126,8 +130,14 @@ rmw_create_client( const rmw_node_t                   * node,
     goto fail;
   }
 
+  request_topic_name = rcutils_format_string(allocator, "%s%sRequest", ros_service_requester_prefix, service_name);
+  reply_topic_name = rcutils_format_string(allocator, "%s%sReply", ros_service_response_prefix, service_name);
+
   requester = callbacks->create_requester(
-    participant, service_str, &datareader_qos, &datawriter_qos,
+    participant, service_str,
+    request_topic_name,
+    reply_topic_name,
+    &datareader_qos, &datawriter_qos,
     reinterpret_cast<void **>(&response_datareader),
     reinterpret_cast<void **>(&request_datawriter),
     &rmw_allocate);
@@ -141,6 +151,12 @@ rmw_create_client( const rmw_node_t                   * node,
   }
   rmw_free(service_str);
   service_str = nullptr;
+
+  rmw_free( request_topic_name );
+  request_topic_name = nullptr;
+
+  rmw_free( reply_topic_name );
+  reply_topic_name = nullptr;
 
   // update partition in the service subscriber 
   if ( response_partition_str &&
